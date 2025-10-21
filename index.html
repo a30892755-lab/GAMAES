@@ -3,8 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dinosaur Merge Master</title>
+<title>Dinosaurs Merge Master</title>
 <style>
+  :root {
+    --board-bg-light: #a6d863;
+    --board-bg-dark: #9acb57;
+    --board-border: #7c4a02;
+    --health-red: #e74c3c;
+    --health-blue: #3498db;
+    --health-bg: #4a4a4a;
+  }
+
   body {
     margin: 0;
     font-family: 'Trebuchet MS', sans-serif;
@@ -12,192 +21,373 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 100vh;
     overflow: hidden;
+    color: white;
   }
+
   header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 90%;
-    max-width: 600px;
-    margin-top: 10px;
-    color: #fff;
-    font-weight: bold;
+    max-width: 500px;
+    margin-bottom: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 2px solid rgba(255,255,255,0.5);
   }
+
+  .header-info {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .game-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .health-bar {
+    width: 15px;
+    height: 300px;
+    background-color: var(--health-bg);
+    border-radius: 10px;
+    border: 3px solid #333;
+    display: flex;
+    flex-direction: column-reverse; /* To fill from bottom up */
+  }
+
+  .health-bar-inner {
+    width: 100%;
+    height: 80%; /* Example health */
+    border-radius: 7px;
+    transition: height 0.5s ease-in-out;
+  }
+
+  #enemy-health { background-color: var(--health-red); }
+  #player-health { background-color: var(--health-blue); }
+
   #gameArea {
-    width: 600px;
-    height: 600px;
-    background: rgba(188, 231, 136, 0.9);
+    width: 400px;
+    height: 500px;
+    background-color: var(--board-bg-light);
+    background-image:
+      linear-gradient(var(--board-bg-dark) 50%, transparent 50%),
+      linear-gradient(90deg, var(--board-bg-dark) 50%, transparent 50%);
+    background-size: 100px 100px; /* Size of the checks */
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
     gap: 5px;
-    border: 5px solid #7c4a02;
+    border: 5px solid var(--board-border);
     border-radius: 10px;
     position: relative;
-    margin-top: 10px;
+    padding: 5px;
   }
+
   .cell {
-    background: rgba(255,255,255,0.3);
+    background: transparent;
     border-radius: 5px;
     position: relative;
   }
-  .dino {
-    width: 80%;
-    height: 80%;
+
+  .unit {
+    width: 90%;
+    height: 90%;
     position: absolute;
-    top: 10%;
-    left: 10%;
-    border-radius: 10px;
+    top: 5%;
+    left: 5%;
     cursor: grab;
-    transition: transform 0.2s;
+    transition: transform 0.2s, top 0.2s, left 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    color: white;
     user-select: none;
   }
-  .level1 { background: green; }
-  .level2 { background: blue; }
-  .level3 { background: purple; }
+
+  .unit:active {
+      cursor: grabbing;
+      transform: scale(1.1);
+      z-index: 100;
+  }
+
+  .unit svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.4));
+  }
+
+  /* Dino colors for different levels */
+  [data-level="1"] .dino-body { fill: #2ecc71; }
+  [data-level="2"] .dino-body { fill: #3498db; }
+  [data-level="3"] .dino-body { fill: #9b59b6; }
+  [data-level="4"] .dino-body { fill: #e67e22; }
+  [data-level="5"] .dino-body { fill: #e74c3c; }
+
 
   #startBtn {
-    margin-top: 10px;
-    padding: 10px 30px;
-    font-size: 20px;
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 22px;
     border: none;
-    border-radius: 10px;
-    background: #2ecc71;
+    border-radius: 15px;
+    background: linear-gradient(180deg, #53d038 0%, #3ca125 100%);
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-bottom: 5px solid #2d7a1c;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  #startBtn:hover { background: #27ae60; }
+  #startBtn:hover {
+    transform: translateY(-2px);
+  }
+  #startBtn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
 </style>
 </head>
 <body>
 
 <header>
-  <div>LEVEL 1</div>
-  <div>🪙 6</div>
+  <div class="header-info" id="level-display">LEVEL 1</div>
+  <div class="header-info" id="coin-display">
+    <span>6</span>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700" stroke="black" stroke-width="1"><circle cx="12" cy="12" r="10"/><text x="12" y="17" font-size="16" text-anchor="middle" fill="black" font-weight="bold">C</text></svg>
+  </div>
 </header>
 
-<div id="gameArea"></div>
-<button id="startBtn">Start Fight</button>
+<div class="game-container">
+    <div class="health-bar"><div id="enemy-health" class="health-bar-inner"></div></div>
+    <div id="gameArea"></div>
+    <div class="health-bar"><div id="player-health" class="health-bar-inner"></div></div>
+</div>
+
+<button id="startBtn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L20 12l-5.5-5.5"/><path d="M4 12h15.5"/></svg>
+    Start Fight
+</button>
 
 <script>
-const gridSize = 4;
+const gridSize = { cols: 4, rows: 5 };
 const gameArea = document.getElementById('gameArea');
-let dinos = [];
+let units = [];
 
-function createCell() {
+// --- SVG Templates ---
+const dinoSVG = (level) => `
+<svg viewBox="0 0 100 100" data-level="${level}">
+    <g class="dino-body">
+        <path d="M62.5,70.5 C57.5,78, 50,85, 40,85 C30,85, 20,78, 20,70 C20,60, 30,55, 35,50 C25,45, 20,35, 22,25 C25,15, 35,10, 45,12 C55,14, 60,25, 58,35 C68,40, 75,50, 75,60 C75,68, 70,75, 62.5,70.5 Z" transform="scale(1.2) translate(-10, -5)"/>
+        <path d="M58,35 C55,38, 50,42, 45,40" stroke="black" stroke-width="2" fill="none"/>
+        <circle cx="55" cy="30" r="3" fill="black"/>
+    </g>
+</svg>`;
+
+const enemySVG = () => `
+<svg viewBox="0 0 100 100">
+  <g>
+    <path fill="#f0d3a9" d="M 50,20 C 65,20 70,30 70,45 C 70,60 60,70 50,70 C 40,70 30,60 30,45 C 30,30 35,20 50,20 Z" />
+    <path fill="#5d4037" d="M 40,15 Q 50,5 60,15 Q 50,25 40,15 Z" />
+    <circle cx="45" cy="40" r="3" fill="black"/>
+    <circle cx="55" cy="40" r="3" fill="black"/>
+    <path d="M 45,55 Q 50,60 55,55" stroke="black" stroke-width="2" fill="none"/>
+  </g>
+</svg>`;
+
+
+// Initialize grid
+for (let i = 0; i < gridSize.cols * gridSize.rows; i++) {
   const cell = document.createElement('div');
   cell.className = 'cell';
   gameArea.appendChild(cell);
-  return cell;
 }
 
-// Initialize grid
-for (let i = 0; i < gridSize * gridSize; i++) {
-  createCell();
-}
-
-// Dino creation
-function spawnDino(level, cellIndex) {
+// Unit creation
+function spawnUnit(type, level, cellIndex) {
   const cell = gameArea.children[cellIndex];
-  const dino = document.createElement('div');
-  dino.className = `dino level${level}`;
-  dino.dataset.level = level;
-  dino.textContent = 'D' + level;
-  cell.appendChild(dino);
-  dinos.push(dino);
-  enableDrag(dino);
+  if (!cell || cell.children.length > 0) return; // Prevent spawning in occupied cell
+
+  const unit = document.createElement('div');
+  unit.className = 'unit';
+  unit.dataset.level = level;
+  unit.dataset.type = type;
+
+  if (type === 'dino') {
+    unit.innerHTML = dinoSVG(level);
+  } else {
+    unit.innerHTML = enemySVG();
+  }
+  
+  cell.appendChild(unit);
+  units.push(unit);
+  enableDrag(unit);
 }
 
-function enableDrag(dino) {
-  let offsetX, offsetY, originCell;
-  dino.addEventListener('mousedown', startDrag);
-  dino.addEventListener('touchstart', startDrag);
+function enableDrag(unit) {
+  let offsetX, offsetY, originCell, draggedUnit;
+
+  unit.addEventListener('mousedown', startDrag);
+  unit.addEventListener('touchstart', startDrag, { passive: false });
 
   function startDrag(e) {
+    // Only allow dragging player dinos
+    if (unit.dataset.type !== 'dino') return;
+    
     e.preventDefault();
-    const rect = dino.getBoundingClientRect();
-    offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-    originCell = dino.parentElement;
+    originCell = unit.parentElement;
+    draggedUnit = unit; // The element being dragged
+    
+    // Bring to front
+    draggedUnit.style.zIndex = 1000;
+
+    const rect = draggedUnit.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    offsetX = touch.clientX - rect.left;
+    offsetY = touch.clientY - rect.top;
+
+    // Move to body for free dragging
+    document.body.appendChild(draggedUnit);
+    draggedUnit.style.position = 'absolute';
+    drag(e); // Initial position update
+
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', drag);
+    document.addEventListener('touchmove', drag, { passive: false });
     document.addEventListener('touchend', endDrag);
-    dino.style.zIndex = 10;
   }
 
   function drag(e) {
+    if (!draggedUnit) return;
     e.preventDefault();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX);
-    const y = (e.touches ? e.touches[0].clientY : e.clientY);
-    dino.style.position = 'fixed';
-    dino.style.left = (x - offsetX) + 'px';
-    dino.style.top = (y - offsetY) + 'px';
+    const touch = e.touches ? e.touches[0] : e;
+    draggedUnit.style.left = (touch.clientX - offsetX) + 'px';
+    draggedUnit.style.top = (touch.clientY - offsetY) + 'px';
   }
 
   function endDrag(e) {
-    const dropTarget = document.elementFromPoint(
-      e.changedTouches ? e.changedTouches[0].clientX : e.clientX,
-      e.changedTouches ? e.changedTouches[0].clientY : e.clientY
-    );
-    dino.style.position = 'absolute';
-    dino.style.zIndex = 1;
-    if (dropTarget && dropTarget.classList.contains('cell')) {
-      if (dropTarget.children.length > 0) {
-        const other = dropTarget.children[0];
-        if (other.dataset.level === dino.dataset.level) {
-          // merge
-          const newLevel = parseInt(dino.dataset.level) + 1;
-          dropTarget.innerHTML = '';
-          spawnDino(newLevel, Array.from(gameArea.children).indexOf(dropTarget));
-        } else {
-          originCell.appendChild(dino);
-        }
-      } else {
-        dropTarget.appendChild(dino);
+    if (!draggedUnit) return;
+
+    // Hide dragged unit to find element underneath
+    draggedUnit.style.display = 'none';
+    const touch = e.changedTouches ? e.changedTouches[0] : e;
+    const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+    draggedUnit.style.display = 'flex';
+
+    let landed = false;
+    const dropCell = dropTarget ? dropTarget.closest('.cell') : null;
+
+    if (dropCell && dropCell.parentElement === gameArea) {
+      // Player area is the bottom 3 rows (cells 8-19)
+      const cellIndex = Array.from(gameArea.children).indexOf(dropCell);
+      if (cellIndex >= gridSize.cols * 2) { // Allow dropping only in player area
+          if (dropCell.children.length === 0) {
+            // Drop on empty cell
+            dropCell.appendChild(draggedUnit);
+            landed = true;
+          } else {
+            // Attempt to merge
+            const otherUnit = dropCell.children[0];
+            if (otherUnit !== draggedUnit && otherUnit.dataset.type === 'dino' && otherUnit.dataset.level === draggedUnit.dataset.level) {
+              const newLevel = parseInt(draggedUnit.dataset.level) + 1;
+              
+              // Remove old units
+              otherUnit.remove();
+              draggedUnit.remove();
+              units = units.filter(u => u !== otherUnit && u !== draggedUnit);
+
+              // Spawn merged unit
+              spawnUnit('dino', newLevel, cellIndex);
+              landed = true; 
+            }
+          }
       }
-    } else {
-      originCell.appendChild(dino);
     }
+
+    if (!landed) {
+      // Return to origin if drop is invalid
+      originCell.appendChild(draggedUnit);
+    }
+    
+    // Reset styles
+    draggedUnit.style.position = 'absolute';
+    draggedUnit.style.left = '5%';
+    draggedunit.style.top = '5%';
+    draggedUnit.style.zIndex = '10';
+
+    draggedUnit = null; // Clear reference
     document.removeEventListener('mousemove', drag);
     document.removeEventListener('mouseup', endDrag);
     document.removeEventListener('touchmove', drag);
     document.removeEventListener('touchend', endDrag);
-    dino.style.left = '10%';
-    dino.style.top = '10%';
   }
 }
 
-// Spawn starting dinos
-spawnDino(1, 5);
-spawnDino(1, 10);
-spawnDino(1, 11);
+// Spawn starting units
+spawnUnit('enemy', 1, 1);
+spawnUnit('enemy', 1, 2);
+
+spawnUnit('dino', 1, 13);
+spawnUnit('dino', 1, 14);
+spawnUnit('dino', 1, 18);
+
 
 document.getElementById('startBtn').addEventListener('click', () => {
-  dinos.forEach(d => {
-    d.style.transition = 'transform 0.1s';
-    let flip = true;
-    const fight = setInterval(() => {
-      d.style.transform = flip ? 'translateX(10px)' : 'translateX(-10px)';
-      flip = !flip;
-    }, 100);
+    const playerUnits = units.filter(u => u.dataset.type === 'dino');
+    const enemyUnits = units.filter(u => u.dataset.type === 'enemy');
+    
+    const moveDuration = 800;
+    const fightDuration = 1000;
+
+    // --- Animation ---
+    // 1. Units move towards each other
+    playerUnits.forEach(unit => {
+        unit.style.transition = `transform ${moveDuration / 1000}s ease-out`;
+        unit.style.transform = 'translateY(-150px)';
+    });
+    enemyUnits.forEach(unit => {
+        unit.style.transition = `transform ${moveDuration / 1000}s ease-out`;
+        unit.style.transform = 'translateY(150px)';
+    });
+
+    // 2. Clash effect after they meet
     setTimeout(() => {
-      clearInterval(fight);
-      d.style.transform = 'none';
-    }, 2000);
-  });
+        const allFighting = [...playerUnits, ...enemyUnits];
+        allFighting.forEach(unit => {
+            let flip = 1;
+            unit.dataset.fightInterval = setInterval(() => {
+                const yTransform = unit.style.transform;
+                unit.style.transform = `${yTransform} translateX(${5 * flip}px) rotate(${3 * flip}deg)`;
+                flip *= -1;
+            }, 100);
+        });
+    }, moveDuration);
+
+    // 3. Return to original positions
+    setTimeout(() => {
+        const allFighting = [...playerUnits, ...enemyUnits];
+        allFighting.forEach(unit => {
+            clearInterval(parseInt(unit.dataset.fightInterval));
+            unit.style.transition = `transform 0.5s ease-in-out`;
+            unit.style.transform = 'none';
+        });
+    }, moveDuration + fightDuration);
 });
 </script>
 </body>
 </html>
+
 
 
 
