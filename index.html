@@ -1,0 +1,200 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinosaurs Merge Master</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Trebuchet MS', sans-serif;
+    background: url('https://i.ibb.co/7GqSvyv/forest-bg.jpg') no-repeat center/cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    max-width: 600px;
+    margin-top: 10px;
+    color: #fff;
+    font-weight: bold;
+  }
+  #gameArea {
+    width: 600px;
+    height: 600px;
+    background: rgba(188, 231, 136, 0.9);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
+    border: 5px solid #7c4a02;
+    border-radius: 10px;
+    position: relative;
+    margin-top: 10px;
+  }
+  .cell {
+    background: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    position: relative;
+  }
+  .dino {
+    width: 80%;
+    height: 80%;
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    user-select: none;
+  }
+  .level1 { background: green; }
+  .level2 { background: blue; }
+  .level3 { background: purple; }
+
+  #startBtn {
+    margin-top: 10px;
+    padding: 10px 30px;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    background: #2ecc71;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  #startBtn:hover { background: #27ae60; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>LEVEL 1</div>
+  <div>🪙 6</div>
+</header>
+
+<div id="gameArea"></div>
+<button id="startBtn">Start Fight</button>
+
+<script>
+const gridSize = 4;
+const gameArea = document.getElementById('gameArea');
+let dinos = [];
+
+function createCell() {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  gameArea.appendChild(cell);
+  return cell;
+}
+
+// Initialize grid
+for (let i = 0; i < gridSize * gridSize; i++) {
+  createCell();
+}
+
+// Dino creation
+function spawnDino(level, cellIndex) {
+  const cell = gameArea.children[cellIndex];
+  const dino = document.createElement('div');
+  dino.className = `dino level${level}`;
+  dino.dataset.level = level;
+  dino.textContent = 'D' + level;
+  cell.appendChild(dino);
+  dinos.push(dino);
+  enableDrag(dino);
+}
+
+function enableDrag(dino) {
+  let offsetX, offsetY, originCell;
+  dino.addEventListener('mousedown', startDrag);
+  dino.addEventListener('touchstart', startDrag);
+
+  function startDrag(e) {
+    e.preventDefault();
+    const rect = dino.getBoundingClientRect();
+    offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    originCell = dino.parentElement;
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchmove', drag);
+    document.addEventListener('touchend', endDrag);
+    dino.style.zIndex = 10;
+  }
+
+  function drag(e) {
+    e.preventDefault();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    const y = (e.touches ? e.touches[0].clientY : e.clientY);
+    dino.style.position = 'fixed';
+    dino.style.left = (x - offsetX) + 'px';
+    dino.style.top = (y - offsetY) + 'px';
+  }
+
+  function endDrag(e) {
+    const dropTarget = document.elementFromPoint(
+      e.changedTouches ? e.changedTouches[0].clientX : e.clientX,
+      e.changedTouches ? e.changedTouches[0].clientY : e.clientY
+    );
+    dino.style.position = 'absolute';
+    dino.style.zIndex = 1;
+    if (dropTarget && dropTarget.classList.contains('cell')) {
+      if (dropTarget.children.length > 0) {
+        const other = dropTarget.children[0];
+        if (other.dataset.level === dino.dataset.level) {
+          // merge
+          const newLevel = parseInt(dino.dataset.level) + 1;
+          dropTarget.innerHTML = '';
+          spawnDino(newLevel, Array.from(gameArea.children).indexOf(dropTarget));
+        } else {
+          originCell.appendChild(dino);
+        }
+      } else {
+        dropTarget.appendChild(dino);
+      }
+    } else {
+      originCell.appendChild(dino);
+    }
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', endDrag);
+    document.removeEventListener('touchmove', drag);
+    document.removeEventListener('touchend', endDrag);
+    dino.style.left = '10%';
+    dino.style.top = '10%';
+  }
+}
+
+// Spawn starting dinos
+spawnDino(1, 5);
+spawnDino(1, 10);
+spawnDino(1, 11);
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  dinos.forEach(d => {
+    d.style.transition = 'transform 0.1s';
+    let flip = true;
+    const fight = setInterval(() => {
+      d.style.transform = flip ? 'translateX(10px)' : 'translateX(-10px)';
+      flip = !flip;
+    }, 100);
+    setTimeout(() => {
+      clearInterval(fight);
+      d.style.transform = 'none';
+    }, 2000);
+  });
+});
+</script>
+</body>
+</html>
