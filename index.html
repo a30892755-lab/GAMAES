@@ -1,390 +1,375 @@
+<!-- Chosen Palette: Calm Harmony (Stone and Soft Teal) -->
+<!-- Application Structure Plan: Dashboard/Thematic approach. The SPA is divided into three core interactive modules: Main Axis (justify-content), Cross Axis (align-items), and Sizing (flex-grow). This functional grouping allows the user to isolate and experiment with the most critical Flexbox concepts sequentially, providing immediate visual feedback and fostering active learning, which is superior to a linear report flow. -->
+<!-- Visualization & Content Choices: 1. Main Axis & Cross Axis Properties -> Goal: Compare/Inform -> Viz: Dynamic Flexbox Container with Items -> Interaction: Buttons to switch CSS classes -> Justification: Directly demonstrates CSS properties using CSS, providing the most accurate visual lesson. 2. Flex Grow -> Goal: Relationships/Sizing -> Viz: Three Items with size proportional to flex-grow value -> Interaction: Input fields/Sliders to set flex-grow values (0-10) -> Justification: Clearly visualizes how remaining space is distributed mathematically. 3. Textual Content -> Goal: Organize/Inform -> Viz: Collapsible Accordion Cards -> Interaction: Click to show/hide details -> Justification: Keeps dense reference information neatly tucked away. Library/Method: Pure HTML/CSS/Tailwind and Vanilla JS (Chart.js/Plotly not used as simple CSS visualization is best suited for teaching CSS layout concepts). -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dinosaurs Merge Master</title>
-<style>
-  :root {
-    --board-bg-light: #a6d863;
-    --board-bg-dark: #9acb57;
-    --board-border: #7c4a02;
-    --health-red: #e74c3c;
-    --health-blue: #3498db;
-    --health-bg: #4a4a4a;
-  }
-
-  body {
-    margin: 0;
-    font-family: 'Trebuchet MS', sans-serif;
-    background: url('https://img.craftpix.net/2019/03/Free-Cartoon-Forest-Game-Backgrounds2.jpg') no-repeat center/cover;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    overflow: hidden;
-    color: white;
-  }
-
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%;
-    max-width: 500px;
-    margin-bottom: 10px;
-    background: rgba(0,0,0,0.3);
-    padding: 5px 15px;
-    border-radius: 20px;
-    border: 2px solid rgba(255,255,255,0.5);
-  }
-
-  .header-info {
-    font-size: 1.2rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .game-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-
-  .health-bar {
-    width: 15px;
-    height: 300px;
-    background-color: var(--health-bg);
-    border-radius: 10px;
-    border: 3px solid #333;
-    display: flex;
-    flex-direction: column-reverse; /* To fill from bottom up */
-  }
-
-  .health-bar-inner {
-    width: 100%;
-    height: 80%; /* Example health */
-    border-radius: 7px;
-    transition: height 0.5s ease-in-out;
-  }
-
-  #enemy-health { background-color: var(--health-red); }
-  #player-health { background-color: var(--health-blue); }
-
-  #gameArea {
-    width: 400px;
-    height: 500px;
-    background-color: var(--board-bg-light);
-    background-image:
-      linear-gradient(var(--board-bg-dark) 50%, transparent 50%),
-      linear-gradient(90deg, var(--board-bg-dark) 50%, transparent 50%);
-    background-size: 100px 100px; /* Size of the checks */
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 5px;
-    border: 5px solid var(--board-border);
-    border-radius: 10px;
-    position: relative;
-    padding: 5px;
-  }
-
-  .cell {
-    background: transparent;
-    border-radius: 5px;
-    position: relative;
-  }
-
-  .unit {
-    width: 90%;
-    height: 90%;
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    cursor: grab;
-    transition: transform 0.2s, top 0.2s, left 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-  }
-
-  .unit:active {
-      cursor: grabbing;
-      transform: scale(1.1);
-      z-index: 100;
-  }
-
-  .unit svg {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.4));
-  }
-
-  /* Dino colors for different levels */
-  [data-level="1"] .dino-body { fill: #2ecc71; }
-  [data-level="2"] .dino-body { fill: #3498db; }
-  [data-level="3"] .dino-body { fill: #9b59b6; }
-  [data-level="4"] .dino-body { fill: #e67e22; }
-  [data-level="5"] .dino-body { fill: #e74c3c; }
-
-
-  #startBtn {
-    margin-top: 20px;
-    padding: 12px 25px;
-    font-size: 22px;
-    border: none;
-    border-radius: 15px;
-    background: linear-gradient(180deg, #53d038 0%, #3ca125 100%);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border-bottom: 5px solid #2d7a1c;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  #startBtn:hover {
-    transform: translateY(-2px);
-  }
-  #startBtn:active {
-    transform: translateY(2px);
-    border-bottom-width: 2px;
-  }
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexbox Interactive Guide (Roman Urdu)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .flex-container {
+            min-height: 250px;
+            border: 3px solid #047857; /* Teal 600 */
+            border-radius: 0.75rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .flex-item {
+            background-color: #f0fdf4; /* Emerald 50 */
+            color: #065f46; /* Emerald 800 */
+            padding: 1rem;
+            margin: 0.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            min-width: 50px;
+            transition: all 0.3s ease-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        /* Chart container styling for responsiveness and constraint */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: 280px; /* Base height for all viz */
+            max-height: 450px;
+        }
+        .section-header {
+            border-left: 5px solid #0d9488; /* Teal 600 */
+        }
+        .grow-input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d6d3d1;
+            text-align: center;
+            font-size: 1.25rem;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-stone-50 text-stone-800 font-sans">
 
-<header>
-  <div class="header-info" id="level-display">LEVEL 1</div>
-  <div class="header-info" id="coin-display">
-    <span>6</span>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700" stroke="black" stroke-width="1"><circle cx="12" cy="12" r="10"/><text x="12" y="17" font-size="16" text-anchor="middle" fill="black" font-weight="bold">C</text></svg>
-  </div>
-</header>
+    <header class="bg-teal-600 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-2xl font-bold text-white">Flexbox Sandpit (Intaf-al-Amal)</h1>
+                <nav class="hidden md:flex space-x-4">
+                    <a href="#main-axis" class="text-white hover:text-teal-200 transition duration-150 p-2 rounded-lg">Main Axis</a>
+                    <a href="#cross-axis" class="text-white hover:text-teal-200 transition duration-150 p-2 rounded-lg">Cross Axis</a>
+                    <a href="#sizing" class="text-white hover:text-teal-200 transition duration-150 p-2 rounded-lg">Sizing</a>
+                    <a href="#properties" class="text-white hover:text-teal-200 transition duration-150 p-2 rounded-lg">Properties</a>
+                </nav>
+            </div>
+        </div>
+    </header>
 
-<div class="game-container">
-    <div class="health-bar"><div id="enemy-health" class="health-bar-inner"></div></div>
-    <div id="gameArea"></div>
-    <div class="health-bar"><div id="player-health" class="health-bar-inner"></div></div>
-</div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-<button id="startBtn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L20 12l-5.5-5.5"/><path d="M4 12h15.5"/></svg>
-    Start Fight
-</button>
+        <!-- Introduction Section -->
+        <section class="mb-16">
+            <h2 class="text-4xl font-extrabold text-teal-700 mb-4">Flexbox: Layout Ka Zabardast Tareeqa</h2>
+            <p class="text-xl text-stone-600 border-b pb-4 mb-8">
+                Flexbox ek ek-tarafah (one-dimensional) layout model hai, jiska maqsad hai ki aap apne web page ke components ko aasani se arrange, space, aur align kar saken. Is interactive tool (Sandpit) mein, aap in zaroori properties ko badal kar unke asar ko foran (instantly) dekh sakte hain.
+            </p>
 
-<script>
-const gridSize = { cols: 4, rows: 5 };
-const gameArea = document.getElementById('gameArea');
-let units = [];
+            <div class="grid md:grid-cols-2 gap-8 text-lg">
+                <div class="p-6 bg-white rounded-xl shadow-lg border-l-4 border-teal-500">
+                    <p class="font-semibold text-teal-600 mb-2">Flex Container (Baap Element) - `display: flex;`</p>
+                    <p>Yeh woh bada dabba hai jis par hum `display: flex;` lagate hain. Yeh apne andar ke saare bachchon (items) ka layout control karta hai.</p>
+                </div>
+                <div class="p-6 bg-white rounded-xl shadow-lg border-l-4 border-teal-500">
+                    <p class="font-semibold text-teal-600 mb-2">Flex Items (Bachche Elements)</p>
+                    <p>Yeh woh chhote dabba hain jo container ke andar hote hain. In par `flex-grow` aur `order` jaisi properties lagti hain.</p>
+                </div>
+            </div>
+        </section>
 
-// --- SVG Templates ---
-const dinoSVG = (level) => `
-<svg viewBox="0 0 100 100" data-level="${level}">
-    <g class="dino-body">
-        <path d="M62.5,70.5 C57.5,78, 50,85, 40,85 C30,85, 20,78, 20,70 C20,60, 30,55, 35,50 C25,45, 20,35, 22,25 C25,15, 35,10, 45,12 C55,14, 60,25, 58,35 C68,40, 75,50, 75,60 C75,68, 70,75, 62.5,70.5 Z" transform="scale(1.2) translate(-10, -5)"/>
-        <path d="M58,35 C55,38, 50,42, 45,40" stroke="black" stroke-width="2" fill="none"/>
-        <circle cx="55" cy="30" r="3" fill="black"/>
-    </g>
-</svg>`;
+        <!-- 1. Main Axis Control (justify-content) -->
+        <section id="main-axis" class="mb-16 pt-8">
+            <div class="section-header pl-4 mb-6">
+                <h2 class="text-3xl font-bold text-stone-700">1. Main Axis Control (`justify-content`)</h2>
+            </div>
+            <p class="text-lg text-stone-600 mb-6">
+                Yeh section sikhata hai ki `justify-content` property Main Axis par items ko kaise baantti (distributes) hai. Agar `flex-direction: row` hai, toh Main Axis horizontal (left-to-right) hoti hai.
+            </p>
 
-const enemySVG = () => `
-<svg viewBox="0 0 100 100">
-  <g>
-    <path fill="#f0d3a9" d="M 50,20 C 65,20 70,30 70,45 C 70,60 60,70 50,70 C 40,70 30,60 30,45 C 30,30 35,20 50,20 Z" />
-    <path fill="#5d4037" d="M 40,15 Q 50,5 60,15 Q 50,25 40,15 Z" />
-    <circle cx="45" cy="40" r="3" fill="black"/>
-    <circle cx="55" cy="40" r="3" fill="black"/>
-    <path d="M 45,55 Q 50,60 55,55" stroke="black" stroke-width="2" fill="none"/>
-  </g>
-</svg>`;
+            <div class="chart-container">
+                <div id="mainAxisContainer" class="flex-container flex justify-start">
+                    <div class="flex-item">Item 1</div>
+                    <div class="flex-item">Item 2</div>
+                    <div class="flex-item">Item 3</div>
+                </div>
+            </div>
+
+            <div id="mainAxisControls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
+                <button data-value="justify-start" class="control-btn bg-teal-600 text-white rounded-xl py-2 shadow-md hover:bg-teal-700">justify-start</button>
+                <button data-value="justify-end" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">justify-end</button>
+                <button data-value="justify-center" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">justify-center</button>
+                <button data-value="justify-between" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">justify-between</button>
+                <button data-value="justify-around" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">justify-around</button>
+                <button data-value="justify-evenly" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">justify-evenly</button>
+            </div>
+        </section>
+
+        <!-- 2. Cross Axis Control (align-items) -->
+        <section id="cross-axis" class="mb-16 pt-8">
+            <div class="section-header pl-4 mb-6">
+                <h2 class="text-3xl font-bold text-stone-700">2. Cross Axis Control (`align-items`)</h2>
+            </div>
+            <p class="text-lg text-stone-600 mb-6">
+                Yeh section sikhata hai ki `align-items` property Cross Axis par items ko kaise align (seedha) karti hai. Agar `flex-direction: row` hai, toh Cross Axis vertical (top-to-bottom) hoti hai.
+            </p>
+
+            <div class="chart-container h-96">
+                <div id="crossAxisContainer" class="flex-container flex items-start" style="min-height: 350px;">
+                    <div class="flex-item h-20">Item 1</div>
+                    <div class="flex-item h-24">Item 2</div>
+                    <div class="flex-item h-32">Item 3</div>
+                </div>
+            </div>
+
+            <div id="crossAxisControls" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
+                <button data-value="items-start" class="control-btn bg-teal-600 text-white rounded-xl py-2 shadow-md hover:bg-teal-700">items-start</button>
+                <button data-value="items-end" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">items-end</button>
+                <button data-value="items-center" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">items-center</button>
+                <button data-value="items-stretch" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">items-stretch</button>
+                <button data-value="items-baseline" class="control-btn bg-stone-200 text-stone-700 rounded-xl py-2 shadow-md hover:bg-stone-300">items-baseline</button>
+            </div>
+        </section>
+
+        <!-- 3. Sizing Control (flex-grow) -->
+        <section id="sizing" class="mb-16 pt-8">
+            <div class="section-header pl-4 mb-6">
+                <h2 class="text-3xl font-bold text-stone-700">3. Sizing Control (`flex-grow`)</h2>
+            </div>
+            <p class="text-lg text-stone-600 mb-6">
+                `flex-grow` batata hai ki container mein bachi hui extra jagah ko items aapas mein kaise baantenge. Neeche values daalen aur dekhein ki Items kaise stretch hote hain. Item ki size uske `flex-grow` value ke mutabiq badhegi.
+            </p>
+
+            <div class="chart-container">
+                <div id="growContainer" class="flex-container flex justify-start items-center">
+                    <div id="growItem1" class="flex-item" style="flex-grow: 1;">Item 1 (Grow: 1)</div>
+                    <div id="growItem2" class="flex-item" style="flex-grow: 2;">Item 2 (Grow: 2)</div>
+                    <div id="growItem3" class="flex-item" style="flex-grow: 1;">Item 3 (Grow: 1)</div>
+                </div>
+            </div>
+
+            <div id="growControls" class="grid grid-cols-3 gap-6 mt-6 p-4 bg-teal-500/10 rounded-xl">
+                <div>
+                    <label for="grow1" class="block text-md font-medium text-stone-700 mb-2">Item 1 (Grow Value)</label>
+                    <input type="number" id="grow1" class="grow-input" value="1" min="0" max="10">
+                </div>
+                <div>
+                    <label for="grow2" class="block text-md font-medium text-stone-700 mb-2">Item 2 (Grow Value)</label>
+                    <input type="number" id="grow2" class="grow-input" value="2" min="0" max="10">
+                </div>
+                <div>
+                    <label for="grow3" class="block text-md font-medium text-stone-700 mb-2">Item 3 (Grow Value)</label>
+                    <input type="number" id="grow3" class="grow-input" value="1" min="0" max="10">
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Quick Reference (Accordion) -->
+        <section id="properties" class="mb-16 pt-8">
+            <div class="section-header pl-4 mb-6">
+                <h2 class="text-3xl font-bold text-stone-700">4. Zaroori Properties (Quick Reference)</h2>
+            </div>
+            <p class="text-lg text-stone-600 mb-6">
+                Yahan Flexbox ki do main kirdaron (Container aur Items) par lagne wali zaroori properties ki ek mukammal list hai. Click karke detail dekhiye.
+            </p>
+
+            <div class="space-y-4">
+                <div class="accordion-item bg-white rounded-xl shadow-lg overflow-hidden border border-stone-200">
+                    <button class="accordion-header w-full text-left p-4 font-semibold text-xl flex justify-between items-center text-teal-700 hover:bg-stone-50 transition duration-150" data-target="container-details">
+                        Container Ki Properties (Baap par lagti hain)
+                        <span class="chevron">▼</span>
+                    </button>
+                    <div id="container-details" class="accordion-content hidden p-4 bg-stone-100 text-stone-700">
+                        <table class="w-full text-left">
+                            <thead class="border-b-2 border-teal-200">
+                                <tr>
+                                    <th class="py-2">Property</th>
+                                    <th class="py-2">Matlab (Meaning)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-stone-200">
+                                    <td class="py-2 font-mono">display: flex;</td>
+                                    <td class="py-2">Container ko Flexbox bana do. Sabse pehla step.</td>
+                                </tr>
+                                <tr class="border-b border-stone-200">
+                                    <td class="py-2 font-mono">flex-direction</td>
+                                    <td class="py-2">Items kis disha (direction) mein jayenge: `row` ya `column`.</td>
+                                </tr>
+                                <tr class="border-b border-stone-200">
+                                    <td class="py-2 font-mono">justify-content</td>
+                                    <td class="py-2">Main Axis par items ko kaise baantna hai (Horizontal spacing).</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-mono">align-items</td>
+                                    <td class="py-2">Cross Axis par items ko kaise align karna hai (Vertical alignment).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-white rounded-xl shadow-lg overflow-hidden border border-stone-200">
+                    <button class="accordion-header w-full text-left p-4 font-semibold text-xl flex justify-between items-center text-teal-700 hover:bg-stone-50 transition duration-150" data-target="item-details">
+                        Items Ki Properties (Bachchon par lagti hain)
+                        <span class="chevron">▼</span>
+                    </button>
+                    <div id="item-details" class="accordion-content hidden p-4 bg-stone-100 text-stone-700">
+                        <table class="w-full text-left">
+                            <thead class="border-b-2 border-teal-200">
+                                <tr>
+                                    <th class="py-2">Property</th>
+                                    <th class="py-2">Matlab (Meaning)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-stone-200">
+                                    <td class="py-2 font-mono">flex-grow</td>
+                                    <td class="py-2">Agar container mein extra jagah hai, toh yeh item kitni jagah 'khaayega'.</td>
+                                </tr>
+                                <tr class="border-b border-stone-200">
+                                    <td class="py-2 font-mono">flex-shrink</td>
+                                    <td class="py-2">Agar jagah kam hai, toh yeh item kitna chhota hoga.</td>
+                                </tr>
+                                <tr class="border-b border-stone-200">
+                                    <td class="py-2 font-mono">flex-basis</td>
+                                    <td class="py-2">Item ki shuruwaati (default) size kya hogi.</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-mono">order</td>
+                                    <td class="py-2">Items ko kis tarteeb (sequence) mein dikhana hai.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-100 text-stone-600 p-8 text-center text-sm">
+        <p>Yeh Interactive Guide sirf taaleem (education) ke maqsad se banaya gaya hai. Layout by Gemini, using Tailwind CSS.</p>
+    </footer>
+
+    <script>
+        const updateMainAxis = (button) => {
+            const container = document.getElementById('mainAxisContainer');
+            const newClass = button.getAttribute('data-value');
+            
+            // Remove all existing justify- classes
+            container.classList.remove('justify-start', 'justify-end', 'justify-center', 'justify-between', 'justify-around', 'justify-evenly');
+            
+            // Add the new class
+            container.classList.add(newClass);
+
+            // Update button styles
+            document.querySelectorAll('#mainAxisControls .control-btn').forEach(btn => {
+                btn.classList.remove('bg-teal-600', 'text-white');
+                btn.classList.add('bg-stone-200', 'text-stone-700');
+            });
+            button.classList.add('bg-teal-600', 'text-white');
+            button.classList.remove('bg-stone-200', 'text-stone-700');
+        };
+
+        const updateCrossAxis = (button) => {
+            const container = document.getElementById('crossAxisContainer');
+            const newClass = button.getAttribute('data-value');
+
+            // Remove all existing items- classes
+            container.classList.remove('items-start', 'items-end', 'items-center', 'items-stretch', 'items-baseline');
+
+            // Add the new class
+            container.classList.add(newClass);
+            
+            // Update button styles
+            document.querySelectorAll('#crossAxisControls .control-btn').forEach(btn => {
+                btn.classList.remove('bg-teal-600', 'text-white');
+                btn.classList.add('bg-stone-200', 'text-stone-700');
+            });
+            button.classList.add('bg-teal-600', 'text-white');
+            button.classList.remove('bg-stone-200', 'text-stone-700');
+        };
+
+        const updateFlexGrow = () => {
+            const grow1 = parseInt(document.getElementById('grow1').value) || 0;
+            const grow2 = parseInt(document.getElementById('grow2').value) || 0;
+            const grow3 = parseInt(document.getElementById('grow3').value) || 0;
+
+            const item1 = document.getElementById('growItem1');
+            const item2 = document.getElementById('growItem2');
+            const item3 = document.getElementById('growItem3');
+
+            item1.style.flexGrow = grow1;
+            item2.style.flexGrow = grow2;
+            item3.style.flexGrow = grow3;
+
+            item1.textContent = `Item 1 (Grow: ${grow1})`;
+            item2.textContent = `Item 2 (Grow: ${grow2})`;
+            item3.textContent = `Item 3 (Grow: ${grow3})`;
+        };
+
+        const setupEventListeners = () => {
+            // Main Axis Controls
+            document.querySelectorAll('#mainAxisControls .control-btn').forEach(button => {
+                button.addEventListener('click', () => updateMainAxis(button));
+            });
+            
+            // Cross Axis Controls
+            document.querySelectorAll('#crossAxisControls .control-btn').forEach(button => {
+                button.addEventListener('click', () => updateCrossAxis(button));
+            });
+
+            // Flex Grow Controls
+            document.querySelectorAll('#growControls input').forEach(input => {
+                input.addEventListener('input', updateFlexGrow);
+            });
+
+            // Accordion Logic
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', (event) => {
+                    const targetId = header.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
+                    const chevron = header.querySelector('.chevron');
+                    
+                    const isHidden = content.classList.contains('hidden');
+
+                    // Close all others
+                    document.querySelectorAll('.accordion-content').forEach(c => c.classList.add('hidden'));
+                    document.querySelectorAll('.chevron').forEach(c => c.textContent = '▼');
 
 
-// Initialize grid
-for (let i = 0; i < gridSize.cols * gridSize.rows; i++) {
-  const cell = document.createElement('div');
-  cell.className = 'cell';
-  gameArea.appendChild(cell);
-}
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        chevron.textContent = '▲';
+                    }
+                });
+            });
+            
+            // Initial call for cross-axis to set button color
+            updateCrossAxis(document.querySelector('#crossAxisControls button[data-value="items-start"]'));
+            // Initial call for grow to set initial values
+            updateFlexGrow();
+        };
 
-// Unit creation
-function spawnUnit(type, level, cellIndex) {
-  const cell = gameArea.children[cellIndex];
-  if (!cell || cell.children.length > 0) return; // Prevent spawning in occupied cell
-
-  const unit = document.createElement('div');
-  unit.className = 'unit';
-  unit.dataset.level = level;
-  unit.dataset.type = type;
-
-  if (type === 'dino') {
-    unit.innerHTML = dinoSVG(level);
-  } else {
-    unit.innerHTML = enemySVG();
-  }
-  
-  cell.appendChild(unit);
-  units.push(unit);
-  enableDrag(unit);
-}
-
-function enableDrag(unit) {
-  let offsetX, offsetY, originCell, draggedUnit;
-
-  unit.addEventListener('mousedown', startDrag);
-  unit.addEventListener('touchstart', startDrag, { passive: false });
-
-  function startDrag(e) {
-    // Only allow dragging player dinos
-    if (unit.dataset.type !== 'dino') return;
-    
-    e.preventDefault();
-    originCell = unit.parentElement;
-    draggedUnit = unit; // The element being dragged
-    
-    // Bring to front
-    draggedUnit.style.zIndex = 1000;
-
-    const rect = draggedUnit.getBoundingClientRect();
-    const touch = e.touches ? e.touches[0] : e;
-    offsetX = touch.clientX - rect.left;
-    offsetY = touch.clientY - rect.top;
-
-    // Move to body for free dragging
-    document.body.appendChild(draggedUnit);
-    draggedUnit.style.position = 'absolute';
-    drag(e); // Initial position update
-
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', drag, { passive: false });
-    document.addEventListener('touchend', endDrag);
-  }
-
-  function drag(e) {
-    if (!draggedUnit) return;
-    e.preventDefault();
-    const touch = e.touches ? e.touches[0] : e;
-    draggedUnit.style.left = (touch.clientX - offsetX) + 'px';
-    draggedUnit.style.top = (touch.clientY - offsetY) + 'px';
-  }
-
-  function endDrag(e) {
-    if (!draggedUnit) return;
-
-    // Hide dragged unit to find element underneath
-    draggedUnit.style.display = 'none';
-    const touch = e.changedTouches ? e.changedTouches[0] : e;
-    const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
-    draggedUnit.style.display = 'flex';
-
-    let landed = false;
-    const dropCell = dropTarget ? dropTarget.closest('.cell') : null;
-
-    if (dropCell && dropCell.parentElement === gameArea) {
-      // Player area is the bottom 3 rows (cells 8-19)
-      const cellIndex = Array.from(gameArea.children).indexOf(dropCell);
-      if (cellIndex >= gridSize.cols * 2) { // Allow dropping only in player area
-          if (dropCell.children.length === 0) {
-            // Drop on empty cell
-            dropCell.appendChild(draggedUnit);
-            landed = true;
-          } else {
-            // Attempt to merge
-            const otherUnit = dropCell.children[0];
-            if (otherUnit !== draggedUnit && otherUnit.dataset.type === 'dino' && otherUnit.dataset.level === draggedUnit.dataset.level) {
-              const newLevel = parseInt(draggedUnit.dataset.level) + 1;
-              
-              // Remove old units
-              otherUnit.remove();
-              draggedUnit.remove();
-              units = units.filter(u => u !== otherUnit && u !== draggedUnit);
-
-              // Spawn merged unit
-              spawnUnit('dino', newLevel, cellIndex);
-              landed = true; 
-            }
-          }
-      }
-    }
-
-    if (!landed) {
-      // Return to origin if drop is invalid
-      originCell.appendChild(draggedUnit);
-    }
-    
-    // Reset styles
-    draggedUnit.style.position = 'absolute';
-    draggedUnit.style.left = '5%';
-    draggedunit.style.top = '5%';
-    draggedUnit.style.zIndex = '10';
-
-    draggedUnit = null; // Clear reference
-    document.removeEventListener('mousemove', drag);
-    document.removeEventListener('mouseup', endDrag);
-    document.removeEventListener('touchmove', drag);
-    document.removeEventListener('touchend', endDrag);
-  }
-}
-
-// Spawn starting units
-spawnUnit('enemy', 1, 1);
-spawnUnit('enemy', 1, 2);
-
-spawnUnit('dino', 1, 13);
-spawnUnit('dino', 1, 14);
-spawnUnit('dino', 1, 18);
-
-
-document.getElementById('startBtn').addEventListener('click', () => {
-    const playerUnits = units.filter(u => u.dataset.type === 'dino');
-    const enemyUnits = units.filter(u => u.dataset.type === 'enemy');
-    
-    const moveDuration = 800;
-    const fightDuration = 1000;
-
-    // --- Animation ---
-    // 1. Units move towards each other
-    playerUnits.forEach(unit => {
-        unit.style.transition = `transform ${moveDuration / 1000}s ease-out`;
-        unit.style.transform = 'translateY(-150px)';
-    });
-    enemyUnits.forEach(unit => {
-        unit.style.transition = `transform ${moveDuration / 1000}s ease-out`;
-        unit.style.transform = 'translateY(150px)';
-    });
-
-    // 2. Clash effect after they meet
-    setTimeout(() => {
-        const allFighting = [...playerUnits, ...enemyUnits];
-        allFighting.forEach(unit => {
-            let flip = 1;
-            unit.dataset.fightInterval = setInterval(() => {
-                const yTransform = unit.style.transform;
-                unit.style.transform = `${yTransform} translateX(${5 * flip}px) rotate(${3 * flip}deg)`;
-                flip *= -1;
-            }, 100);
-        });
-    }, moveDuration);
-
-    // 3. Return to original positions
-    setTimeout(() => {
-        const allFighting = [...playerUnits, ...enemyUnits];
-        allFighting.forEach(unit => {
-            clearInterval(parseInt(unit.dataset.fightInterval));
-            unit.style.transition = `transform 0.5s ease-in-out`;
-            unit.style.transform = 'none';
-        });
-    }, moveDuration + fightDuration);
-});
-</script>
+        // Initial setup on window load
+        window.onload = setupEventListeners;
+    </script>
 </body>
 </html>
 
